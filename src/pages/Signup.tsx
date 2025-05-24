@@ -158,6 +158,14 @@ const Signup = () => {
         cursor: 'pointer',
     };
 
+    const messageStyle: CSSProperties = {
+        textAlign: 'center',
+        marginTop: '12px',
+        fontSize: '14px',
+        color: '#444',
+    };
+
+
     return (
         <div style={page}>
             <div style={navbar}>
@@ -192,6 +200,7 @@ const Signup = () => {
                         <span style={{ marginRight: 8 }}>🔍</span>
                         Sign up with Google
                     </button>
+                    {message && <div style={messageStyle}>{message}</div>}
                 </form>
             </div>
         </div>
