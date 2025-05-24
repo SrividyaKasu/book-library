@@ -1,147 +1,136 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import type { FormEvent, ChangeEvent } from 'react';
+import type { CSSProperties } from 'react';
 
+interface UserData {
+    name: string;
+    email: string;
+    createdAt: Date;
+}
 
-const SignUp = () => {
+const userConverter = {
+    toFirestore(user: UserData) {
+        return user;
+    },
+    fromFirestore(snapshot: any): UserData {
+        const data = snapshot.data();
+        return {
+            name: data.name,
+            email: data.email,
+            createdAt: data.createdAt.toDate?.() ?? new Date(),
+        };
+    }
+};
+
+const Signup = () => {
     const [form, setForm] = useState({ name: '', email: '', password: '' });
     const [message, setMessage] = useState('');
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setForm((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async e => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
         try {
-            const userCredential = await createUserWithEmailAndPassword(
-                auth,
-                form.email,
-                form.password
-            );
+            const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password);
             const user = userCredential.user;
 
-            // Save to Firestore after successful signup
-            await setDoc(doc(db, 'users', user.uid), {
+            const userData: UserData = {
                 name: form.name,
                 email: form.email,
                 createdAt: new Date(),
-            });
-            setMessage('✅ Account created for ' + userCredential.user.email);
+            };
+
+            const userDoc = doc(db, 'users', user.uid).withConverter(userConverter);
+            await setDoc(userDoc, userData);
+
+            setMessage(`✅ Account created for ${user.email}`);
         } catch (error) {
-            setMessage('❌ ' + error.message);
-            console.error('Error code:', error.code);
+            if (error instanceof Error) {
+                console.error('Error:', error.message);
+                setMessage(`❌ ${error.message}`);
+            } else {
+                setMessage('❌ Unknown error');
+            }
         }
     };
 
-    return (
-        <div style={styles.page}>
-            {/* Top bar */}
-            <div style={styles.navbar}>
-                <h2 style={styles.brand}>Library</h2>
-                <div style={styles.navLinks}>
-                    <a href="/">Home</a>
-                    <a href="/">Explore</a>
-                    <a href="/">My Books</a>
-                    <button style={styles.loginButton}>Log in</button>
-                </div>
-            </div>
-
-            {/* Center form */}
-            <div style={styles.formWrapper}>
-                <h1 style={styles.heading}>Create your account</h1>
-                <form onSubmit={handleSubmit} style={styles.form}>
-                    <label>Name</label>
-                    <input type="text" name="name" value={form.name}  onChange={handleChange} placeholder="Enter your name" style={styles.input}/>
-
-                    <label>Email</label>
-                    <input type="email" name="email" value={form.email}  onChange={handleChange} placeholder="Enter your email" style={styles.input}/>
-
-                    <label>Password</label>
-                    <input type="password" name="password" value={form.password}  onChange={handleChange} placeholder="Enter your password" style={styles.input}/>
-
-                    <button type="submit" style={styles.signUpButton}>Sign Up</button>
-
-                    <div style={styles.orWrapper}>
-                        <span>Or sign up with</span>
-                    </div>
-
-                    <button style={styles.googleButton}>
-                        <span style={{marginRight: 8}}>🔍</span>
-                        Sign up with Google
-                    </button>
-                </form>
-            </div>
-        </div>
-    );
-};
-
-const styles = {
-    page: {
+    const page: CSSProperties = {
         fontFamily: 'Arial, sans-serif',
         backgroundColor: '#fafafa',
         minHeight: '100vh',
-    },
-    navbar: {
+    };
+
+    const navbar: CSSProperties = {
         display: 'flex',
         alignItems: 'center',
         padding: '16px 32px',
         borderBottom: '1px solid #eee',
-    },
-    brand: {
+    };
+
+    const brand: CSSProperties = {
         margin: 0,
         fontWeight: 'bold',
         fontSize: '22px',
-    },
-    navLinks: {
+    };
+
+    const navLinks: CSSProperties = {
         marginLeft: 'auto',
         display: 'flex',
         alignItems: 'center',
         gap: '24px',
-    },
-    loginButton: {
+    };
+
+    const loginButton: CSSProperties = {
         padding: '6px 16px',
         borderRadius: '20px',
         border: 'none',
         backgroundColor: '#f2f2f2',
         cursor: 'pointer',
         fontWeight: 'bold',
-    },
-    formWrapper: {
+    };
+
+    const formWrapper: CSSProperties = {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        marginTop: '16px', // reduced from 48px
+        marginTop: '32px',
         width: '100%',
-    },
+    };
 
-    form: {
+    const formStyle: CSSProperties = {
         display: 'flex',
         flexDirection: 'column',
-        gap: '18px',
-        width: '540px',          // wider form
-        maxWidth: '95vw',        // responsive for small screens
-        padding: '32px',         // breathing space
-        backgroundColor: '#fff', // optional white background for contrast
-        borderRadius: '12px',    // rounded edges for polish
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)', // subtle shadow
-    },
-    heading: {
+        gap: '16px',
+        width: '100%',
+        maxWidth: '480px',
+        padding: '32px',
+        backgroundColor: '#fff',
+        borderRadius: '12px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+    };
+
+    const heading: CSSProperties = {
         fontSize: '28px',
         fontWeight: 'bold',
-        marginBottom: '24px',
-        marginTop: '0px', // remove any top margin
-    },
-    input: {
+        marginBottom: '16px',
+        textAlign: 'center',
+    };
+
+    const input: CSSProperties = {
         padding: '12px',
         borderRadius: '12px',
         border: '1px solid #ddd',
         backgroundColor: '#f2f2f2',
         fontSize: '16px',
-    },
-    signUpButton: {
+    };
+
+    const signUpButton: CSSProperties = {
         backgroundColor: '#000',
         color: '#fff',
         padding: '12px',
@@ -149,13 +138,15 @@ const styles = {
         fontWeight: 'bold',
         border: 'none',
         cursor: 'pointer',
-    },
-    orWrapper: {
+    };
+
+    const orWrapper: CSSProperties = {
         textAlign: 'center',
         color: '#777',
         fontSize: '14px',
-    },
-    googleButton: {
+    };
+
+    const googleButton: CSSProperties = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -165,7 +156,46 @@ const styles = {
         border: 'none',
         fontWeight: 'bold',
         cursor: 'pointer',
-    },
+    };
+
+    return (
+        <div style={page}>
+            <div style={navbar}>
+                <h2 style={brand}>Library</h2>
+                <div style={navLinks}>
+                    <a href="/">Home</a>
+                    <a href="/">Explore</a>
+                    <a href="/">My Books</a>
+                    <button style={loginButton}>Log in</button>
+                </div>
+            </div>
+            <div style={formWrapper}>
+                <form onSubmit={handleSubmit} style={formStyle}>
+                    <h1 style={heading}>Create your account</h1>
+
+                    <label>Name</label>
+                    <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="Enter your name" style={input} />
+
+                    <label>Email</label>
+                    <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="Enter your email" style={input} />
+
+                    <label>Password</label>
+                    <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="Enter your password" style={input} />
+
+                    <button type="submit" style={signUpButton}>Sign Up</button>
+
+                    <div style={orWrapper}>
+                        <span>Or sign up with</span>
+                    </div>
+
+                    <button type="button" style={googleButton}>
+                        <span style={{ marginRight: 8 }}>🔍</span>
+                        Sign up with Google
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
 };
 
-export default SignUp;
+export default Signup;
