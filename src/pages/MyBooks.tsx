@@ -1,7 +1,7 @@
 import React from 'react';
-import books from '../data/books.json'; // assuming you store the JSON file here
+import books from '../data/books.json';
 
-const MyBooks: React.FC = () => {
+const MyBooks = () => {
     return (
         <div style={styles.page}>
             <h1 style={styles.heading}>My Books</h1>
