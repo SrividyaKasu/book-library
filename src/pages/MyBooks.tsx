@@ -1,82 +1,54 @@
-import React from 'react';
-import books from '../data/books.json';
+import React, { useEffect, useState } from 'react';
+import { db } from '../firebase';
+import { collection, getDocs } from 'firebase/firestore';
+import {bookConverter } from '../types/bookModel.ts';
 
-const MyBooks = () => {
+
+interface Book {
+    title: string;
+    author: string;
+    coverPageLink: string;
+}
+
+const MyBooks: React.FC = () => {
+    const [books, setBooks] = useState<Book[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchBooks = async () => {
+            try {
+                const booksRef = collection(db, 'books').withConverter(bookConverter);
+                const snapshot = await getDocs(booksRef);
+                setBooks(snapshot.docs.map(doc => doc.data()));
+            } catch (err) {
+                console.error('Error fetching books:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchBooks();
+    }, []);
+
     return (
-        <div style={styles.page}>
-            <h1 style={styles.heading}>My Books</h1>
-            <div style={styles.tabs}>
-                <span style={{ ...styles.tab, ...styles.tabActive }}>All</span>
-                <span style={styles.tab}>Reading</span>
-                <span style={styles.tab}>Finished</span>
-            </div>
-            <div style={styles.grid}>
-                {books.map((book, index) => (
-                    <div key={index} style={styles.card}>
-                        <img
-                            src={book.coverPageLink}
-                            alt={book.name}
-                            style={styles.cover}
-                        />
-                        <div style={styles.title}>{book.title}</div>
-                        <div style={styles.author}>{book.author}</div>
-                    </div>
-                ))}
-            </div>
+        <div style={{ padding: '32px' }}>
+            <h1>My Books</h1>
+            {loading ? <p>Loading...</p> : (
+                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                    {books.map((book, i) => (
+                        <div key={i} style={{ width: 160, textAlign: 'center' }}>
+                            {book.coverPageLink ? (
+                                <img src={book.coverPageLink} alt={book.title} style={{ width: '100%', borderRadius: '8px' }} />
+                            ) : (
+                                <div style={{ width: '100%', height: '240px', background: '#eee', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>No Cover</div>
+                            )}
+                            <div>{book.title}</div>
+                            <div style={{ fontSize: '14px', color: '#666' }}>{book.author}</div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
-};
-
-const styles: { [key: string]: React.CSSProperties } = {
-    page: {
-        fontFamily: 'Arial, sans-serif',
-        padding: '32px',
-    },
-    heading: {
-        fontSize: '32px',
-        fontWeight: 'bold',
-        marginBottom: '16px',
-    },
-    tabs: {
-        display: 'flex',
-        gap: '24px',
-        marginBottom: '16px',
-        fontWeight: 'bold',
-    },
-    tab: {
-        cursor: 'pointer',
-        color: '#666',
-    },
-    tabActive: {
-        color: '#000',
-        borderBottom: '2px solid #000',
-    },
-    grid: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '24px',
-    },
-    card: {
-        width: '160px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-    },
-    cover: {
-        width: '100%',
-        borderRadius: '8px',
-        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-    },
-    title: {
-        marginTop: '8px',
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    author: {
-        fontSize: '14px',
-        color: '#666',
-        textAlign: 'center',
-    },
 };
 
 export default MyBooks;
