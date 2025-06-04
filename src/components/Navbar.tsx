@@ -61,37 +61,44 @@ const Navbar = () => {
     const navbar: CSSProperties = {
         display: 'flex',
         alignItems: 'center',
-        padding: '12px 24px',
-        borderBottom: '1px solid #eee',
-        height: '56px',
-        backgroundColor: 'white',
+        padding: '16px 32px',
+        background: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000,
+        height: '64px',
     };
 
     const brand: CSSProperties = {
         margin: 0,
         display: 'flex',
         alignItems: 'center',
-        gap: '6px',
-        fontSize: '20px',
-        fontWeight: 'bold',
+        gap: '12px',
+        fontSize: '24px',
+        fontWeight: '800',
         textDecoration: 'none',
-        color: '#000',
+        color: '#1a1a1a',
+        letterSpacing: '-0.5px',
     };
 
     const logoIcon: CSSProperties = {
-        fontSize: '20px',
+        fontSize: '24px',
         display: 'flex',
         alignItems: 'center',
-        background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+        background: 'linear-gradient(135deg, #FF6B6B, #FF8E53)',
         color: 'white',
-        width: '32px',
-        height: '32px',
-        borderRadius: '6px',
+        width: '40px',
+        height: '40px',
+        borderRadius: '12px',
         justifyContent: 'center',
+        boxShadow: '0 2px 8px rgba(255, 107, 107, 0.25)',
     };
 
     const navLinks: CSSProperties = {
-        marginLeft: '32px',
+        marginLeft: '48px',
         display: 'flex',
         alignItems: 'center',
         gap: '8px',
@@ -99,20 +106,24 @@ const Navbar = () => {
     };
 
     const navLink: CSSProperties = {
-        padding: '6px 12px',
+        padding: '8px 16px',
         textDecoration: 'none',
-        color: '#64748b',
-        fontSize: '14px',
+        color: '#666',
+        fontSize: '15px',
         fontWeight: '500',
-        borderRadius: '6px',
+        borderRadius: '12px',
         transition: 'all 0.2s ease',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
     };
 
     const activeNavLink: CSSProperties = {
         ...navLink,
-        backgroundColor: '#f1f5f9',
-        color: '#2563eb',
+        backgroundColor: '#fff',
+        color: '#FF6B6B',
         fontWeight: '600',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
     };
 
     const profileContainer: CSSProperties = {
@@ -120,10 +131,10 @@ const Navbar = () => {
     };
 
     const profileIcon: CSSProperties = {
-        width: '36px',
-        height: '36px',
-        borderRadius: '50%',
-        background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+        width: '40px',
+        height: '40px',
+        borderRadius: '12px',
+        background: 'linear-gradient(135deg, #FF6B6B, #FF8E53)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -131,72 +142,78 @@ const Navbar = () => {
         fontSize: '16px',
         color: 'white',
         fontWeight: 'bold',
-        transition: 'transform 0.2s ease',
-        transform: isDropdownOpen ? 'scale(1.1)' : 'scale(1)',
+        transition: 'all 0.2s ease',
+        transform: isDropdownOpen ? 'scale(1.05)' : 'scale(1)',
+        boxShadow: '0 2px 8px rgba(255, 107, 107, 0.25)',
     };
 
     const dropdownMenu: CSSProperties = {
         position: 'absolute',
         top: '120%',
         right: 0,
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-        padding: '16px',
-        minWidth: '240px',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderRadius: '16px',
+        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.08)',
+        padding: '20px',
+        minWidth: '280px',
         display: isDropdownOpen ? 'block' : 'none',
         zIndex: 1000,
+        border: '1px solid rgba(0, 0, 0, 0.05)',
     };
 
     const userInfo: CSSProperties = {
-        marginBottom: '16px',
-        padding: '12px',
-        borderRadius: '8px',
-        backgroundColor: '#f8fafc',
+        marginBottom: '20px',
+        padding: '16px',
+        borderRadius: '12px',
+        backgroundColor: '#fff',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
     };
 
     const userName: CSSProperties = {
         fontSize: '18px',
-        fontWeight: 'bold',
+        fontWeight: '700',
         marginBottom: '4px',
-        color: '#1e293b',
+        color: '#1a1a1a',
+        letterSpacing: '-0.3px',
     };
 
     const userEmail: CSSProperties = {
         fontSize: '14px',
-        color: '#64748b',
+        color: '#666',
         wordBreak: 'break-all',
     };
 
     const logoutButton: CSSProperties = {
-        width: 'auto',
-        padding: '8px 16px',
-        background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+        width: '100%',
+        padding: '12px 20px',
+        background: 'linear-gradient(135deg, #FF6B6B, #FF8E53)',
         color: 'white',
         border: 'none',
-        borderRadius: '6px',
+        borderRadius: '12px',
         cursor: 'pointer',
-        fontSize: '13px',
-        fontWeight: '500',
+        fontSize: '15px',
+        fontWeight: '600',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '6px',
-        transition: 'opacity 0.2s ease',
-        margin: '0 auto',
+        gap: '8px',
+        transition: 'all 0.2s ease',
+        boxShadow: '0 2px 8px rgba(255, 107, 107, 0.25)',
     };
 
     const divider: CSSProperties = {
         height: '1px',
-        backgroundColor: '#e2e8f0',
-        margin: '16px 0',
+        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+        margin: '20px 0',
     };
 
     return (
         <div style={navbar}>
             <a href="/my-books" style={brand}>
                 <div style={logoIcon}>📚</div>
-                <span>Library</span>
+                <span>Bookshelf</span>
             </a>
             {user && (
                 <div style={navLinks}>
@@ -205,36 +222,38 @@ const Navbar = () => {
                         style={location.pathname === '/my-books' ? activeNavLink : navLink}
                         onMouseOver={e => {
                             if (location.pathname !== '/my-books') {
-                                e.currentTarget.style.backgroundColor = '#f8fafc';
-                                e.currentTarget.style.color = '#3b82f6';
+                                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                                e.currentTarget.style.color = '#FF6B6B';
                             }
                         }}
                         onMouseOut={e => {
                             if (location.pathname !== '/my-books') {
                                 e.currentTarget.style.backgroundColor = 'transparent';
-                                e.currentTarget.style.color = '#64748b';
+                                e.currentTarget.style.color = '#666';
                             }
                         }}
                     >
-                        📚 My Books
+                        <span style={{ fontSize: '18px' }}>📚</span>
+                        My Books
                     </a>
                     <a 
                         href="/borrowed" 
                         style={location.pathname === '/borrowed' ? activeNavLink : navLink}
                         onMouseOver={e => {
                             if (location.pathname !== '/borrowed') {
-                                e.currentTarget.style.backgroundColor = '#f8fafc';
-                                e.currentTarget.style.color = '#3b82f6';
+                                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                                e.currentTarget.style.color = '#FF6B6B';
                             }
                         }}
                         onMouseOut={e => {
                             if (location.pathname !== '/borrowed') {
                                 e.currentTarget.style.backgroundColor = 'transparent';
-                                e.currentTarget.style.color = '#64748b';
+                                e.currentTarget.style.color = '#666';
                             }
                         }}
                     >
-                        📅 Borrowed Books
+                        <span style={{ fontSize: '18px' }}>📅</span>
+                        Borrowed Books
                     </a>
                 </div>
             )}
@@ -256,10 +275,16 @@ const Navbar = () => {
                         <button 
                             style={logoutButton} 
                             onClick={handleLogout}
-                            onMouseOver={e => (e.currentTarget.style.opacity = '0.9')}
-                            onMouseOut={e => (e.currentTarget.style.opacity = '1')}
+                            onMouseOver={e => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 107, 107, 0.3)';
+                            }}
+                            onMouseOut={e => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 107, 107, 0.25)';
+                            }}
                         >
-                            <span style={{ fontSize: '14px' }}>👋</span>
+                            <span style={{ fontSize: '18px' }}>👋</span>
                             Sign out
                         </button>
                     </div>
