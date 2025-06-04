@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { auth, db } from '../firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import type { FormEvent, ChangeEvent } from 'react';
 import type { CSSProperties } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface UserData {
     name: string;
@@ -26,8 +27,10 @@ const userConverter = {
 };
 
 const Signup = () => {
+    const [isSignIn, setIsSignIn] = useState(true);
     const [form, setForm] = useState({ name: '', email: '', password: '' });
     const [message, setMessage] = useState('');
+    const navigate = useNavigate();
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -36,20 +39,29 @@ const Signup = () => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setMessage('');
+        
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password);
-            const user = userCredential.user;
+            if (isSignIn) {
+                const userCredential = await signInWithEmailAndPassword(auth, form.email, form.password);
+                setMessage(`✅ Welcome back, ${userCredential.user.email}!`);
+                navigate('/my-books');
+            } else {
+                const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password);
+                const user = userCredential.user;
 
-            const userData: UserData = {
-                name: form.name,
-                email: form.email,
-                createdAt: new Date(),
-            };
+                const userData: UserData = {
+                    name: form.name,
+                    email: form.email,
+                    createdAt: new Date(),
+                };
 
-            const userDoc = doc(db, 'users', user.uid).withConverter(userConverter);
-            await setDoc(userDoc, userData);
+                const userDoc = doc(db, 'users', user.uid).withConverter(userConverter);
+                await setDoc(userDoc, userData);
 
-            setMessage(`✅ Account created for ${user.email}`);
+                setMessage(`✅ Account created for ${user.email}`);
+                navigate('/my-books');
+            }
         } catch (error) {
             if (error instanceof Error) {
                 console.error('Error:', error.message);
@@ -64,42 +76,42 @@ const Signup = () => {
         fontFamily: 'Arial, sans-serif',
         backgroundColor: '#fafafa',
         minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
     };
 
-    const navbar: CSSProperties = {
+    const logoWrapper: CSSProperties = {
         display: 'flex',
         alignItems: 'center',
-        padding: '16px 32px',
-        borderBottom: '1px solid #eee',
+        gap: '8px',
+        marginTop: '48px',
+        marginBottom: '32px',
     };
 
-    const brand: CSSProperties = {
+    const logoIcon: CSSProperties = {
+        fontSize: '24px',
+        display: 'flex',
+        alignItems: 'center',
+        background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+        color: 'white',
+        width: '36px',
+        height: '36px',
+        borderRadius: '8px',
+        justifyContent: 'center',
+    };
+
+    const logoText: CSSProperties = {
+        fontSize: '24px',
+        fontWeight: 'bold',
+        color: '#000',
         margin: 0,
-        fontWeight: 'bold',
-        fontSize: '22px',
-    };
-
-    const navLinks: CSSProperties = {
-        marginLeft: 'auto',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '24px',
-    };
-
-    const loginButton: CSSProperties = {
-        padding: '6px 16px',
-        borderRadius: '20px',
-        border: 'none',
-        backgroundColor: '#f2f2f2',
-        cursor: 'pointer',
-        fontWeight: 'bold',
     };
 
     const formWrapper: CSSProperties = {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        marginTop: '32px',
         width: '100%',
     };
 
@@ -130,7 +142,7 @@ const Signup = () => {
         fontSize: '16px',
     };
 
-    const signUpButton: CSSProperties = {
+    const submitButton: CSSProperties = {
         backgroundColor: '#000',
         color: '#fff',
         padding: '12px',
@@ -140,22 +152,14 @@ const Signup = () => {
         cursor: 'pointer',
     };
 
-    const orWrapper: CSSProperties = {
-        textAlign: 'center',
-        color: '#777',
-        fontSize: '14px',
-    };
-
-    const googleButton: CSSProperties = {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '12px',
-        borderRadius: '24px',
-        backgroundColor: '#eee',
+    const toggleButton: CSSProperties = {
+        background: 'none',
         border: 'none',
-        fontWeight: 'bold',
+        color: '#3b82f6',
         cursor: 'pointer',
+        fontSize: '14px',
+        padding: '8px',
+        textAlign: 'center',
     };
 
     const messageStyle: CSSProperties = {
@@ -165,41 +169,71 @@ const Signup = () => {
         color: '#444',
     };
 
-
     return (
         <div style={page}>
-            <div style={navbar}>
-                <h2 style={brand}>Library</h2>
-                <div style={navLinks}>
-                    <a href="/">Home</a>
-                    <a href="/">Explore</a>
-                    <a href="/">My Books</a>
-                    <button style={loginButton}>Log in</button>
-                </div>
+            <div style={logoWrapper}>
+                <div style={logoIcon}>📚</div>
+                <h1 style={logoText}>Library</h1>
             </div>
             <div style={formWrapper}>
                 <form onSubmit={handleSubmit} style={formStyle}>
-                    <h1 style={heading}>Create your account</h1>
+                    <h1 style={heading}>{isSignIn ? 'Welcome Back' : 'Create your account'}</h1>
 
-                    <label>Name</label>
-                    <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="Enter your name" style={input} />
+                    {!isSignIn && (
+                        <>
+                            <label>Name</label>
+                            <input 
+                                type="text" 
+                                name="name" 
+                                value={form.name} 
+                                onChange={handleChange} 
+                                placeholder="Enter your name" 
+                                style={input}
+                                required={!isSignIn}
+                            />
+                        </>
+                    )}
 
                     <label>Email</label>
-                    <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="Enter your email" style={input} />
+                    <input 
+                        type="email" 
+                        name="email" 
+                        value={form.email} 
+                        onChange={handleChange} 
+                        placeholder="Enter your email" 
+                        style={input}
+                        required
+                    />
 
                     <label>Password</label>
-                    <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="Enter your password" style={input} />
+                    <input 
+                        type="password" 
+                        name="password" 
+                        value={form.password} 
+                        onChange={handleChange} 
+                        placeholder="Enter your password" 
+                        style={input}
+                        required
+                    />
 
-                    <button type="submit" style={signUpButton}>Sign Up</button>
-
-                    <div style={orWrapper}>
-                        <span>Or sign up with</span>
-                    </div>
-
-                    <button type="button" style={googleButton}>
-                        <span style={{ marginRight: 8 }}>🔍</span>
-                        Sign up with Google
+                    <button type="submit" style={submitButton}>
+                        {isSignIn ? 'Sign In' : 'Sign Up'}
                     </button>
+
+                    <button 
+                        type="button" 
+                        style={toggleButton}
+                        onClick={() => {
+                            setIsSignIn(!isSignIn);
+                            setMessage('');
+                            setForm({ name: '', email: '', password: '' });
+                        }}
+                    >
+                        {isSignIn 
+                            ? "Don't have an account? Sign Up" 
+                            : "Already have an account? Sign In"}
+                    </button>
+
                     {message && <div style={messageStyle}>{message}</div>}
                 </form>
             </div>
