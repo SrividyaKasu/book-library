@@ -194,48 +194,12 @@ const Navbar = () => {
 
     return (
         <div style={navbar}>
-            <a href="/" style={brand}>
+            <a href="/my-books" style={brand}>
                 <div style={logoIcon}>📚</div>
                 <span>Library</span>
             </a>
             {user && (
                 <div style={navLinks}>
-                    <a 
-                        href="/" 
-                        style={location.pathname === '/' ? activeNavLink : navLink}
-                        onMouseOver={e => {
-                            if (location.pathname !== '/') {
-                                e.currentTarget.style.backgroundColor = '#f8fafc';
-                                e.currentTarget.style.color = '#3b82f6';
-                            }
-                        }}
-                        onMouseOut={e => {
-                            if (location.pathname !== '/') {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                                e.currentTarget.style.color = '#64748b';
-                            }
-                        }}
-                    >
-                        🏠 Home
-                    </a>
-                    <a 
-                        href="/explore" 
-                        style={location.pathname === '/explore' ? activeNavLink : navLink}
-                        onMouseOver={e => {
-                            if (location.pathname !== '/explore') {
-                                e.currentTarget.style.backgroundColor = '#f8fafc';
-                                e.currentTarget.style.color = '#3b82f6';
-                            }
-                        }}
-                        onMouseOut={e => {
-                            if (location.pathname !== '/explore') {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                                e.currentTarget.style.color = '#64748b';
-                            }
-                        }}
-                    >
-                        🔍 Explore
-                    </a>
                     <a 
                         href="/my-books" 
                         style={location.pathname === '/my-books' ? activeNavLink : navLink}
@@ -253,6 +217,24 @@ const Navbar = () => {
                         }}
                     >
                         📚 My Books
+                    </a>
+                    <a 
+                        href="/borrowed" 
+                        style={location.pathname === '/borrowed' ? activeNavLink : navLink}
+                        onMouseOver={e => {
+                            if (location.pathname !== '/borrowed') {
+                                e.currentTarget.style.backgroundColor = '#f8fafc';
+                                e.currentTarget.style.color = '#3b82f6';
+                            }
+                        }}
+                        onMouseOut={e => {
+                            if (location.pathname !== '/borrowed') {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                                e.currentTarget.style.color = '#64748b';
+                            }
+                        }}
+                    >
+                        📅 Borrowed Books
                     </a>
                 </div>
             )}
